@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Home from './components/Home';
+import Home from './pages/Home';
 import PokerGame from './components/PokerGame';  // Example for a card game
 import BlackJack from './components/BlackJack';  // Another game example
 

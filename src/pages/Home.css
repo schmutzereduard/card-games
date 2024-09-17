@@ -1,0 +1,59 @@
+.Home {
+    display: flex;
+    flex-direction: column;  /* Stack items vertically */
+    justify-content: center; /* Vertically center the items */
+    align-items: center;     /* Horizontally center the items */
+    height: 100vh;           /* Full viewport height */
+    text-align: center;      /* Centers the text */
+}
+
+.App-logo {
+    height: 40vmin;
+    pointer-events: none;
+    margin-bottom: 20px;    /* Adds space below the logo */
+}
+
+input {
+    margin-bottom: 20px;     /* Space between input and buttons */
+    padding: 10px;           /* Add padding inside the input */
+    font-size: 1rem;         /* Adjust font size */
+    border: 1px solid #ccc;  /* Border styling */
+    border-radius: 5px;      /* Rounded corners */
+    width: 250px;            /* Width for the input */
+}
+
+button {
+    background-color: #007bff;   /* Button background color */
+    color: white;                /* Button text color */
+    padding: 10px 20px;          /* Padding inside the button */
+    margin: 10px;                /* Space between buttons */
+    border: none;                /* Remove button border */
+    border-radius: 5px;          /* Rounded corners */
+    font-size: 1rem;             /* Font size for the button text */
+    cursor: pointer;             /* Change cursor to pointer on hover */
+    transition: background-color 0.3s ease;  /* Transition for hover effect */
+}
+
+button:hover {
+    background-color: #0056b3;   /* Darker blue on hover */
+}
+
+button:focus {
+    outline: none;               /* Remove outline when button is focused */
+}
+
+
+@media (prefers-reduced-motion: no-preference) {
+    .App-logo {
+      animation: App-logo-spin infinite 20s linear;
+    }
+  }
+
+@keyframes App-logo-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }

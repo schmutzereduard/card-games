@@ -1,14 +1,9 @@
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { fetchDeck } from '../features/deckSlice';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 function PokerGame() {
-  const dispatch = useDispatch();
   const { deck, isLoading, error } = useSelector((state) => state.deck);
-
-  useEffect(() => {
-    dispatch(fetchDeck());
-  }, [dispatch]);
+  const navigate = useNavigate();
 
   return (
     <div>
@@ -16,6 +11,7 @@ function PokerGame() {
       {isLoading && <p>Loading...</p>}
       {error && <p>Error: {error.message}</p>}
       {deck && <p>Deck ID: {deck.deck_id}</p>}
+      <button onClick={() => navigate("/")}>Home</button>
     </div>
   );
 }
