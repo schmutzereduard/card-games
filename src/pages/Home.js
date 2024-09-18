@@ -33,9 +33,21 @@ function Home() {
         <div className='Home'>
             <h1>React Mini Card Games</h1>
             <img src={logo} className="App-logo" alt="logo" />
-            <input ref={deckId} placeholder='Already have a deck id ?'></input>
-            <button onClick={() => setProfileModalOpen(true)}>Profile</button>
+
+            <div className="input-wrapper">
+                <img 
+                    src={sessionStorage.getItem("profileInfo") ? "profile.svg" : "create-profile.svg"}
+                    alt="Profile" 
+                    className="profile-icon" 
+                    onClick={() => setProfileModalOpen(true)} 
+                />
+
+                <input ref={deckId} placeholder='Already have a deck id?' />
+            </div>
+
             <ProfileModal isOpen={isProfileModalOpen} onClose={() => setProfileModalOpen(false)} />
+
+            <h2>Games:</h2>
             <button onClick={() => handleNavigate("/poker")}>Poker</button>
             <button onClick={() => handleNavigate("/blackjack")}>BlackJack</button>
         </div>
