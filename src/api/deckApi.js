@@ -1,8 +1,11 @@
 // src/api/deckApi.js
 import axios from 'axios';
-
-const DECK_API_BASE_URL = 'https://deckofcardsapi.com/api/deck/';
+import { NEW_DECK_URL, SHUFFLE_DECK_URL } from '../Constants';
 
 export const fetchNewDeck = () => {
-  return axios.get(`${DECK_API_BASE_URL}new/shuffle/`);
+  return axios.get(NEW_DECK_URL);
+};
+
+export const shuffleTheDeck = (deckId) => {
+  return axios.get(SHUFFLE_DECK_URL.replace("{DECK_ID}", deckId));
 };

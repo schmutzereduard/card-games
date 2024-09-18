@@ -3,26 +3,28 @@ import logo from '../logo.svg';
 import './Home.css';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { fetchDeck } from '../features/deckSlice';
+import { fetchDeck, shuffleDeck } from '../features/deckSlice';
 import ProfileModal from '../components/ProfileModal/ProfileModal';
 
 function Home() {
 
-    const deckId = useRef(null);
+    const deckIdRef = useRef(null);
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const [isProfileModalOpen, setProfileModalOpen] = useState(false);
 
     useEffect(() => {
-        deckId.current.focus();
-        console.log(deckId.current.value);
+        deckIdRef.current.focus();
+        console.log(deckIdRef.current.value);
     }, []);
 
     const handleNavigate = (path) => {
 
-        if (deckId.current.value !== "") {
-            
+        const deckId = deckIdRef.current.value;
+
+        if (deckId !== "") {
+            dispatch(shuffleDeck(deckId));
         } else {
             dispatch(fetchDeck());
         }
@@ -42,7 +44,7 @@ function Home() {
                     onClick={() => setProfileModalOpen(true)} 
                 />
 
-                <input ref={deckId} placeholder='Already have a deck id?' />
+                <input ref={deckIdRef} placeholder='Already have a deck id?' />
             </div>
 
             <ProfileModal isOpen={isProfileModalOpen} onClose={() => setProfileModalOpen(false)} />
