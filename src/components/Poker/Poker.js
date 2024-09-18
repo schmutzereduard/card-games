@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-function PokerGame() {
+function Poker() {
   const { deck, isLoading, error } = useSelector((state) => state.deck);
   const navigate = useNavigate();
 
@@ -16,4 +16,4 @@ function PokerGame() {
   );
 }
 
-export default PokerGame;
+export default Poker;
