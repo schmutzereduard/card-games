@@ -37,11 +37,11 @@ function Home() {
             <img src={logo} className="App-logo" alt="logo" />
 
             <div className="input-wrapper">
-                <img 
+                <img
                     src={sessionStorage.getItem("profileInfo") ? "profile.svg" : "create-profile.svg"}
-                    alt="Profile" 
-                    className="profile-icon" 
-                    onClick={() => setProfileModalOpen(true)} 
+                    alt="Profile"
+                    className="profile-icon"
+                    onClick={() => setProfileModalOpen(true)}
                 />
 
                 <input ref={deckIdRef} placeholder='Already have a deck id?' />
@@ -49,9 +49,11 @@ function Home() {
 
             <ProfileModal isOpen={isProfileModalOpen} onClose={() => setProfileModalOpen(false)} />
 
-            <h2>Games:</h2>
-            <button onClick={() => handleNavigate("/poker")}>Poker</button>
-            <button onClick={() => handleNavigate("/blackjack")}>BlackJack</button>
+            <div className="games-wrapper" hidden={sessionStorage.getItem("profileInfo") == null}>
+                <h2>Games:</h2>
+                <button onClick={() => handleNavigate("/poker")}>Poker</button>
+                <button onClick={() => handleNavigate("/blackjack")}>BlackJack</button>
+            </div>
         </div>
     );
 }
