@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Paytable from './Paytable';
 import { createContext, useState } from 'react';
 import Betting from './Betting';
+import Game from './Game';
 
 export const PokerContext = createContext(null);
 //88c9fnhfyxsz
@@ -22,6 +23,7 @@ function Poker() {
       {deck && <p>Deck ID: {deck.deck_id}</p>}
       <Paytable />
       <Betting />
+      <Game />
       <button onClick={() => navigate("/")}>Home</button>
     </div>
     </PokerContext.Provider>

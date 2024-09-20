@@ -16,7 +16,6 @@ function Home() {
 
     useEffect(() => {
         deckIdRef.current.focus();
-        console.log(deckIdRef.current.value);
     }, []);
 
     const handleNavigate = (path) => {
