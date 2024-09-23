@@ -5,15 +5,15 @@ function Betting() {
 
     const betRef = useRef(null);
     const profile = JSON.parse(sessionStorage.getItem("profileInfo"));
-    const { bet, setBet, gameStarted, setGameStarted } = useContext(PokerContext);
+    const { bet, setBet, gameStarted, start, end } = useContext(PokerContext);
 
 
     const handleButtonClick = () => {
 
         if (gameStarted) {
-            setGameStarted(false);
+            end();
         } else {
-            validateBet() && setGameStarted(true);
+            validateBet() && start();
         }
     }
 

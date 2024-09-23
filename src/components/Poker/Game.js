@@ -1,23 +1,60 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
-import { drawCards } from "../../features/deckSlice"; // Make sure this path is correct
+import { changeCards } from "../../features/deckSlice";
+import { PokerContext } from "./Poker";
+import { CARD_BACK_URL } from "../../Constants";
 
 function Game() {
-    const dispatch = useDispatch();  // Add useDispatch
-    const deck = useSelector((state) => state.deck);
-    const [selectedCards, setSelectedCards] = useState(0);
+    const dispatch = useDispatch();
+    const { gameStarted, round, setRound } = useContext(PokerContext);
+    const [selectedCards, setSelectedCards] = useState([]);
+    const deck = useSelector((state) => state.deck.deck);
+    const gameCards = useSelector((state) => state.deck.gameCards);
 
     useEffect(() => {
-        console.log(deck);
-    }, [deck]);
+        if (!gameStarted) {
+            setSelectedCards([]);
+        }
+    }, [gameStarted]);
 
-    const handleButtonClick = () => {
-        // Dispatch the thunk instead of calling it directly
-        dispatch(drawCards({ deckId: deck.deck.deck_id, count: 5, target: "game" }));    };
+    const handleCardClick = (card) => {
+        setSelectedCards((prevSelected) => {
+            if (prevSelected.includes(card)) {
+                return prevSelected.filter(selectedCard => selectedCard.code !== card.code); // Remove the card if already selected
+            } else if (prevSelected.length < 3) {
+                return [...prevSelected, card]; // Add the card if not selected
+            } else {
+                return [...prevSelected];
+            }
+        });
+    };
+
+    const handleChangeClick = () => {
+        setRound(round + 1);
+        setSelectedCards([]);
+        dispatch(changeCards( { 
+            deckId: deck.deck_id,
+            count: selectedCards.length,
+            targetHand: "game",
+            targetCards: selectedCards 
+        } ));
+    }
 
     return (
         <div id="game-wrapper">
-            <button onClick={handleButtonClick}>DRAW</button>
+            {gameStarted && <h2>Round: {round}</h2>}
+            <button onClick={handleChangeClick}>Change</button>
+            {gameCards.map((card, index) => {
+                const isSelected = selectedCards.some(selectedCard => selectedCard.code === card.code);
+                return (
+                    <img
+                        key={index}
+                        src={isSelected ? CARD_BACK_URL : card.image}
+                        alt={`${card.code} of ${card.suit}`}
+                        onClick={() => handleCardClick(card)}
+                    />
+                );
+            })}
         </div>
     );
 }

@@ -26,6 +26,14 @@ export const drawCards = createAsyncThunk(
   }
 );
 
+export const changeCards = createAsyncThunk(
+  'deck/changeCards',
+  async ({ deckId, count, targetHand, targetCards }) => {
+    const response = await drawFromDeck(deckId, count);
+    return { cards: response.data.cards, targetHand, targetCards };
+  }
+);
+
 const deckSlice = createSlice({
   name: 'deck', //this will be used to access the data (ex: state.deck)
   initialState: {
@@ -35,7 +43,16 @@ const deckSlice = createSlice({
     isLoading: false,
     error: null,
   },
-  reducers: {}, //sync actions
+  reducers: {
+    clearCards: (state, action) => {
+      const { target } = action.payload;
+      if (target === "game") {
+        state.gameCards = [];
+      } else if (target === "player") {
+        state.playerCards = [];
+      }
+    }
+  }, //sync actions
   extraReducers: (builder) => { //async actions
     builder
       .addCase(fetchDeck.pending, (state) => {
@@ -75,8 +92,32 @@ const deckSlice = createSlice({
         state.error = action.error;
         state.isLoading = false;
       })
+      .addCase(changeCards.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(changeCards.fulfilled, (state, action) => {
+        const { cards } = action.payload;
+        const { targetHand, targetCards } = action.meta.arg; 
+        if (targetHand === "game") {
+          state.gameCards = [
+            ...state.gameCards.filter(card => !targetCards.some(selectedCard => selectedCard.code === card.code)), 
+            ...cards
+          ];
+        } else if (action.meta.arg.target === "player") {
+          state.playerCards = [
+            ...state.playerCards.filter(card => !targetCards.some(selectedCard => selectedCard.code === card.code)),
+            ...cards
+          ];
+        }
+        state.isLoading = false;
+      })
+      .addCase(changeCards.rejected, (state, action) => {
+        state.error = action.error;
+        state.isLoading = false;
+      })
       ;
   },
 });
 
+export const { clearCards } = deckSlice.actions;
 export default deckSlice.reducer;
