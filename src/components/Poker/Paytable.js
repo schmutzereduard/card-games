@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { HANDS } from "./Hands";
 import { PokerContext } from "./Poker";
+import './Poker.css';
 
 
 function Paytable() {
@@ -8,7 +9,7 @@ function Paytable() {
     const { bet } = useContext(PokerContext);
 
     return (
-        <div id="paytable-wrapper">
+        <div className="Paytable">
             <table>
                 <thead>
                     <tr>

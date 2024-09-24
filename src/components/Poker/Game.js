@@ -32,18 +32,18 @@ function Game() {
     const handleChangeClick = () => {
         setRound(round + 1);
         setSelectedCards([]);
-        dispatch(changeCards( { 
+        dispatch(changeCards({
             deckId: deck.deck_id,
             count: selectedCards.length,
             targetHand: "game",
-            targetCards: selectedCards 
-        } ));
+            targetCards: selectedCards
+        }));
     }
 
     return (
         <div id="game-wrapper">
             {gameStarted && <h2>Round: {round}</h2>}
-            <button onClick={handleChangeClick}>Change</button>
+            <button hidden={!gameStarted} onClick={handleChangeClick}>Change</button>
             {gameCards.map((card, index) => {
                 const isSelected = selectedCards.some(selectedCard => selectedCard.code === card.code);
                 return (

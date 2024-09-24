@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { drawFromDeck, fetchNewDeck, shuffleTheDeck } from '../api/deckApi';
-import { saveProfile } from '../utils/LocalStorage';
+import { getProfile, saveProfile } from '../utils/LocalStorage';
 // Thunk to fetch a new deck from the Deck of Cards API
 export const fetchDeck = createAsyncThunk(
   'deck/fetchDeck', //creates 3 subactions: fetchDeck.pending, fetchDeck.fufilled, fetchDeck.rejected
@@ -61,7 +61,13 @@ const deckSlice = createSlice({
       .addCase(fetchDeck.fulfilled, (state, action) => {
         state.deck = action.payload;
         state.isLoading = false;
-        saveProfile({ name: "Guest", funds: 10, deckId: state.deck.deck_id});
+        const profile = getProfile();
+        if (profile) {
+          profile.deckId = state.deck.deck_id;
+          saveProfile(profile);
+        } else {
+          saveProfile({ name: "Guest", funds: 10, deckId: state.deck.deck_id });
+        }
       })
       .addCase(fetchDeck.rejected, (state, action) => {
         state.error = action.error;
@@ -98,10 +104,10 @@ const deckSlice = createSlice({
       })
       .addCase(changeCards.fulfilled, (state, action) => {
         const { cards } = action.payload;
-        const { targetHand, targetCards } = action.meta.arg; 
+        const { targetHand, targetCards } = action.meta.arg;
         if (targetHand === "game") {
           state.gameCards = [
-            ...state.gameCards.filter(card => !targetCards.some(selectedCard => selectedCard.code === card.code)), 
+            ...state.gameCards.filter(card => !targetCards.some(selectedCard => selectedCard.code === card.code)),
             ...cards
           ];
         } else if (action.meta.arg.target === "player") {

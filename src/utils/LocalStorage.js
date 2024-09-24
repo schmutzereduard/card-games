@@ -10,3 +10,15 @@ export function getProfile() {
 export function deleteProfile() {
     return localStorage.removeItem("profileInfo");
 }
+
+export function extractFunds(bet) {
+    const profile = getProfile();
+    profile.funds -= bet;
+    saveProfile(profile);
+}
+
+export function addFunds(win) {
+    const profile = getProfile();
+    profile.funds += win;
+    saveProfile(profile);
+}

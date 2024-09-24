@@ -1,6 +1,7 @@
 import { useContext, useRef } from "react";
 import { PokerContext } from "./Poker";
 import { getProfile } from "../../utils/LocalStorage";
+import './Poker.css';
 
 function Betting() {
 
@@ -55,7 +56,7 @@ function Betting() {
             <br />
             <input onChange={handleInputChange} ref={betRef} value= {bet} type="number" placeholder="Place your bet" disabled={gameStarted} />
             <br />
-            <button onClick={handleButtonClick}>{gameStarted ? "End Game" : "Start Game"}</button>
+            <button id="start-game" onClick={handleButtonClick}>{gameStarted ? "End Game" : "Start Game"}</button>
         </div>
     ) : null;
 }

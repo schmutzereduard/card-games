@@ -18,7 +18,6 @@ function Home() {
     const handleNavigate = (path) => {
 
         if (profile && profile.deckId !== "") {
-            console.log("huh ?");
             dispatch(shuffleDeck(profile.deckId));
         } else {
             dispatch(fetchDeck());
