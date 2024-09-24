@@ -1,10 +1,11 @@
 import { useEffect, useRef } from "react";
+import { deleteProfile, getProfile, saveProfile } from "../../utils/LocalStorage";
 
 function ProfileModal({ isOpen, onClose }) {
 
     if (!isOpen) return null;
 
-    const profile = JSON.parse(sessionStorage.getItem("profileInfo"));
+    const profile = getProfile();
 
     return profile ? (<Profile profile={profile} onClose={onClose} />) : (<CreateProfile onClose={onClose} />);
 }
@@ -13,15 +14,17 @@ function CreateProfile({onClose}) {
 
     const nameRef = useRef(null);
     const startingFundsRef = useRef(null);
+    const deckIdRef = useRef(null);
 
     useEffect(() => {
         nameRef.current.focus();
     }, []);
 
 
-    const handleButtonClick = () => {
+    const handleCreateButtonClick = () => {
         const name = nameRef.current.value;
         const funds = startingFundsRef.current.value;
+        const deckId = deckIdRef.current.value;
     
         if (name === "" || funds === "") {
             alert("Please enter a name and choose your starting funds!");
@@ -37,9 +40,10 @@ function CreateProfile({onClose}) {
         const profileInfo = {
             name: name,
             funds: fundsValue,
+            deckId: deckId
         };
     
-        sessionStorage.setItem("profileInfo", JSON.stringify(profileInfo));
+        saveProfile(profileInfo);
         onClose();
     };
 
@@ -54,7 +58,11 @@ function CreateProfile({onClose}) {
                 <input ref={startingFundsRef} type="number" placeholder="Enter your starting funds"/>
                 <br />
 
-                <button onClick={handleButtonClick}>Create profile</button>
+                <label>Deck ID: </label>
+                <input ref={deckIdRef} placeholder="Already have a Deck ID?" />
+                <br />
+
+                <button onClick={handleCreateButtonClick}>Create</button>
                 <button onClick={onClose}>Close</button>
             </div>
         </div>
@@ -63,6 +71,11 @@ function CreateProfile({onClose}) {
 
 function Profile({ profile, onClose }) {
 
+    const handleLogOutButtonClick = () => {
+        deleteProfile();
+        onClose();
+    }
+
     return (
         <div style={styles.modalOverlay}>
             <div style={styles.modalContent}>
@@ -70,7 +83,10 @@ function Profile({ profile, onClose }) {
                 <br />
                 <label>Funds: {profile.funds}$</label>
                 <br />
+                <label>Deck ID: {profile.deckId}</label>
+                <br />
                 <button onClick={onClose}>Close</button>
+                <button onClick={handleLogOutButtonClick}>Log out</button>
             </div>
         </div>
     );

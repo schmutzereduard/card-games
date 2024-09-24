@@ -1,29 +1,25 @@
 import { useNavigate } from 'react-router-dom';
 import logo from '../logo.svg';
 import './Home.css';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { fetchDeck, shuffleDeck } from '../features/deckSlice';
 import ProfileModal from '../components/ProfileModal/ProfileModal';
+import { getProfile } from '../utils/LocalStorage';
 
 function Home() {
 
-    const deckIdRef = useRef(null);
+    const profile = getProfile();
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const [isProfileModalOpen, setProfileModalOpen] = useState(false);
 
-    useEffect(() => {
-        deckIdRef.current.focus();
-    }, []);
-
     const handleNavigate = (path) => {
 
-        const deckId = deckIdRef.current.value;
-
-        if (deckId !== "") {
-            dispatch(shuffleDeck(deckId));
+        if (profile && profile.deckId !== "") {
+            console.log("huh ?");
+            dispatch(shuffleDeck(profile.deckId));
         } else {
             dispatch(fetchDeck());
         }
@@ -35,23 +31,21 @@ function Home() {
             <h1>React Mini Card Games</h1>
             <img src={logo} className="App-logo" alt="logo" />
 
-            <div className="input-wrapper">
+            <div className='home-controls'>
                 <img
-                    src={sessionStorage.getItem("profileInfo") ? "profile.svg" : "create-profile.svg"}
+                    src={profile ? "profile.svg" : "create-profile.svg"}
                     alt="Profile"
                     className="profile-icon"
                     onClick={() => setProfileModalOpen(true)}
                 />
 
-                <input ref={deckIdRef} placeholder='Already have a deck id?' />
-            </div>
+                <ProfileModal isOpen={isProfileModalOpen} onClose={() => setProfileModalOpen(false)} />
 
-            <ProfileModal isOpen={isProfileModalOpen} onClose={() => setProfileModalOpen(false)} />
-
-            <div className="games-wrapper" hidden={sessionStorage.getItem("profileInfo") == null}>
-                <h2>Games:</h2>
-                <button onClick={() => handleNavigate("/poker")}>Poker</button>
-                <button onClick={() => handleNavigate("/blackjack")}>BlackJack</button>
+                <div className="games-wrapper">
+                    <h2>Games:</h2>
+                    <button onClick={() => handleNavigate("/poker")}>Poker</button>
+                    <button onClick={() => handleNavigate("/blackjack")}>BlackJack</button>
+                </div>
             </div>
         </div>
     );

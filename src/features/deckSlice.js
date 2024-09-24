@@ -1,11 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { drawFromDeck, fetchNewDeck, shuffleTheDeck } from '../api/deckApi';
+import { saveProfile } from '../utils/LocalStorage';
 // Thunk to fetch a new deck from the Deck of Cards API
 export const fetchDeck = createAsyncThunk(
   'deck/fetchDeck', //creates 3 subactions: fetchDeck.pending, fetchDeck.fufilled, fetchDeck.rejected
   async () => {
     const response = await fetchNewDeck();
-    alert("Your new deck id is: " + response.data.deck_id);
     return response.data;
   }
 );
@@ -61,6 +61,7 @@ const deckSlice = createSlice({
       .addCase(fetchDeck.fulfilled, (state, action) => {
         state.deck = action.payload;
         state.isLoading = false;
+        saveProfile({ name: "Guest", funds: 10, deckId: state.deck.deck_id});
       })
       .addCase(fetchDeck.rejected, (state, action) => {
         state.error = action.error;

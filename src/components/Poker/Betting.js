@@ -1,10 +1,11 @@
 import { useContext, useRef } from "react";
 import { PokerContext } from "./Poker";
+import { getProfile } from "../../utils/LocalStorage";
 
 function Betting() {
 
     const betRef = useRef(null);
-    const profile = JSON.parse(sessionStorage.getItem("profileInfo"));
+    const profile = getProfile();
     const { bet, setBet, gameStarted, start, end } = useContext(PokerContext);
 
 
@@ -48,7 +49,7 @@ function Betting() {
         return true;
     }
 
-    return (
+    return profile ? (
         <div id="controls-wrapper">
             <label>Funds: {profile.funds}$</label>
             <br />
@@ -56,7 +57,7 @@ function Betting() {
             <br />
             <button onClick={handleButtonClick}>{gameStarted ? "End Game" : "Start Game"}</button>
         </div>
-    );
+    ) : null;
 }
 
 export default Betting;

@@ -5,6 +5,7 @@
     align-items: center;     /* Horizontally center the items */
     height: 100vh;           /* Full viewport height */
     text-align: center;      /* Centers the text */
+    background-color: black;
 }
 
 .App-logo {
@@ -13,10 +14,8 @@
     margin-bottom: 20px;    /* Adds space below the logo */
 }
 
-.input-wrapper {
-  display: flex;                 /* Creates a flex container to align items horizontally */
-  align-items: center;           /* Vertically centers the profile icon and input field */
-  margin-top: 20px;              /* Adds space above the entire input-wrapper */
+.home-controls {
+  background-color: white;
 }
 
 .profile-icon {
@@ -25,6 +24,7 @@
   cursor: pointer;               /* Changes cursor to pointer when hovered */
   margin-right: 10px;            /* Adds space between the profile icon and input */
   object-fit: cover;             /* Ensures the image fits well within the set dimensions */
+  padding-top: 50px;
 }
 
 .input {
