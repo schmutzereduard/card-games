@@ -55,7 +55,7 @@ function CreateProfile({onClose}) {
                 <br />
 
                 <label>Funds: </label>
-                <input value={100} disabled={true} ref={startingFundsRef} type="number" placeholder="Enter your starting funds"/>
+                <input value={100} disabled={true}ref={startingFundsRef} type="number" placeholder="Enter your starting funds"/>
                 <br />
 
                 <label>Deck ID: </label>

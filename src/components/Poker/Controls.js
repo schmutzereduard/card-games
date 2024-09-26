@@ -1,8 +1,9 @@
-import { useContext, useRef } from "react";
+import { useContext, useRef, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { PokerContext } from "./Poker";
 import { getProfile } from "../../utils/LocalStorage";
 import './Poker.css';
+import ConfirmationModal from "../ProfileModal/ConfirmationModal";
 
 function Controls() {
 
@@ -10,15 +11,22 @@ function Controls() {
     const betRef = useRef(null);
     const profile = getProfile();
     const { bet, setBet, gameStarted, start, end } = useContext(PokerContext);
+    const [endGameModalOpen, setEndGameModalOpen] = useState(false);
+    const [returnHomeModalOpen, setReturnHomeModalOpen] = useState(false);
 
 
     const handleStartButtonClick = () => {
 
         if (gameStarted) {
-            end();
+            setEndGameModalOpen(true);
         } else {
             validateBet() && start();
         }
+    }
+    
+    const handleConfirmEndButtonClick = () => {
+        setEndGameModalOpen(false);
+        end();
     }
 
     const handleHomeButtonClick = () => {
@@ -65,7 +73,9 @@ function Controls() {
             <input onChange={handleInputChange} ref={betRef} value= {bet} type="number" placeholder="Place your bet" disabled={gameStarted} />
             <br />
             <button id="start-game" onClick={handleStartButtonClick}>{gameStarted ? "End Game" : "Start Game"}</button>
-            <button id="home" onClick={handleHomeButtonClick}>Home</button>
+            <ConfirmationModal isOpen={endGameModalOpen} onConfirm={handleConfirmEndButtonClick} onClose={() => setEndGameModalOpen(false)} />
+            <button id="home" onClick={() => setReturnHomeModalOpen(true)}>Home</button>
+            <ConfirmationModal isOpen={returnHomeModalOpen} onConfirm={handleHomeButtonClick} onClose={() => setReturnHomeModalOpen(false)} />
         </div>
     ) : null;
 }
