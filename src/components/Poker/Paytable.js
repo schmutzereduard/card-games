@@ -10,6 +10,7 @@ function Paytable() {
 
     return (
         <div className="Paytable">
+            <h2>Paytable: </h2>
             <table>
                 <thead>
                     <tr>

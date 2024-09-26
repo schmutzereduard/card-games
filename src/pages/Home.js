@@ -1,11 +1,11 @@
-import { useNavigate } from 'react-router-dom';
-import logo from '../logo.svg';
-import './Home.css';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { fetchDeck, shuffleDeck } from '../features/deckSlice';
-import ProfileModal from '../components/ProfileModal/ProfileModal';
+import { useNavigate } from 'react-router-dom';
+import { fetchDeck } from '../features/deckSlice';
 import { getProfile } from '../utils/LocalStorage';
+import ProfileModal from '../components/ProfileModal/ProfileModal';
+import logo from '../logo.svg';
+import './Home.css';
 
 function Home() {
 
@@ -16,14 +16,11 @@ function Home() {
     const [isProfileModalOpen, setProfileModalOpen] = useState(false);
 
     const handleNavigate = (path) => {
-
-        if (profile && profile.deckId !== "") {
-            dispatch(shuffleDeck(profile.deckId));
-        } else {
+        if (!profile.deckId)
             dispatch(fetchDeck());
-        }
+
         navigate(path);
-    };
+    }
 
     return (
         <div className='Home'>
@@ -40,11 +37,12 @@ function Home() {
 
                 <ProfileModal isOpen={isProfileModalOpen} onClose={() => setProfileModalOpen(false)} />
 
+                {profile && 
                 <div className="games-wrapper">
                     <h2>Games:</h2>
                     <button onClick={() => handleNavigate("/poker")}>Poker</button>
                     <button onClick={() => handleNavigate("/blackjack")}>BlackJack</button>
-                </div>
+                </div>}
             </div>
         </div>
     );

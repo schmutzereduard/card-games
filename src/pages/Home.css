@@ -14,10 +14,6 @@
     margin-bottom: 20px;    /* Adds space below the logo */
 }
 
-.home-controls {
-  background-color: white;
-}
-
 .profile-icon {
   width: 30px;                   /* Sets the width of the profile icon */
   height: 30px;                  /* Sets the height of the profile icon */

@@ -1,22 +1,29 @@
 import { useContext, useRef } from "react";
+import { useNavigate } from 'react-router-dom';
 import { PokerContext } from "./Poker";
 import { getProfile } from "../../utils/LocalStorage";
 import './Poker.css';
 
-function Betting() {
+function Controls() {
 
+    const navigate = useNavigate();
     const betRef = useRef(null);
     const profile = getProfile();
     const { bet, setBet, gameStarted, start, end } = useContext(PokerContext);
 
 
-    const handleButtonClick = () => {
+    const handleStartButtonClick = () => {
 
         if (gameStarted) {
             end();
         } else {
             validateBet() && start();
         }
+    }
+
+    const handleHomeButtonClick = () => {
+        end();
+        navigate("/");
     }
 
     const handleInputChange = (event) => {
@@ -52,13 +59,15 @@ function Betting() {
 
     return profile ? (
         <div id="controls-wrapper">
+            <h2>Controls: </h2>
             <label>Funds: {profile.funds}$</label>
             <br />
             <input onChange={handleInputChange} ref={betRef} value= {bet} type="number" placeholder="Place your bet" disabled={gameStarted} />
             <br />
-            <button id="start-game" onClick={handleButtonClick}>{gameStarted ? "End Game" : "Start Game"}</button>
+            <button id="start-game" onClick={handleStartButtonClick}>{gameStarted ? "End Game" : "Start Game"}</button>
+            <button id="home" onClick={handleHomeButtonClick}>Home</button>
         </div>
     ) : null;
 }
 
-export default Betting;
+export default Controls;

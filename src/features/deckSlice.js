@@ -12,7 +12,7 @@ export const fetchDeck = createAsyncThunk(
 
 export const shuffleDeck = createAsyncThunk(
   'deck/shuffleDeck',
-  async (deckId) => {
+  async ({ deckId }) => {
     const response = await shuffleTheDeck(deckId);
     return response.data;
   }
@@ -61,13 +61,7 @@ const deckSlice = createSlice({
       .addCase(fetchDeck.fulfilled, (state, action) => {
         state.deck = action.payload;
         state.isLoading = false;
-        const profile = getProfile();
-        if (profile) {
-          profile.deckId = state.deck.deck_id;
-          saveProfile(profile);
-        } else {
-          saveProfile({ name: "Guest", funds: 10, deckId: state.deck.deck_id });
-        }
+        saveProfile({...getProfile(), deckId: action.payload.deck_id});
       })
       .addCase(fetchDeck.rejected, (state, action) => {
         state.error = action.error;

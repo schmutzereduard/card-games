@@ -1,6 +1,7 @@
 
 export function saveProfile(profile) {
     localStorage.setItem("profileInfo", JSON.stringify(profile));
+    return profile;
 }
 
 export function getProfile() {

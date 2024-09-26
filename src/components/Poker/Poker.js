@@ -1,11 +1,12 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { createContext, useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import { drawCards, clearCards, shuffleDeck } from "../../features/deckSlice";
 import { getProfile, extractFunds, addFunds } from '../../utils/LocalStorage';
 import { checkHand } from './Hands';
 import Paytable from './Paytable';
-import Betting from './Betting';
+import History from './History';
+import Controls from './Controls';
 import Game from './Game';
 import './Poker.css';
 
@@ -14,63 +15,64 @@ export const PokerContext = createContext(null);
 function Poker() {
   const profile = getProfile();
   const { deck, isLoading, error, gameCards } = useSelector((state) => state.deck);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [bet, setBet] = useState(1);
   const [gameStarted, setGameStarted] = useState(false);
   const [round, setRound] = useState(0);
-  const [resultMessage, setResultMessage] = useState("");
+  const [history, setHistory] = useState([]);
+  const [lastGame, setLastGame] = useState([]);
 
   useEffect(() => {
-    if (!deck && profile.deckId) {
-      dispatch(shuffleDeck(profile.deckId));
+    if (!deck) {
+      dispatch(shuffleDeck({ deckId: profile.deckId }));
     }
-  }, [deck, profile, dispatch]);
-
-  
+  }
+    , [deck, profile]);
 
   const start = useCallback(() => {
     extractFunds(bet);
     setRound(1);
     setGameStarted(true);
+    setLastGame([]);
+    dispatch(shuffleDeck({ deckId: deck.deck_id }));
     dispatch(drawCards({ deckId: deck.deck_id, count: 5, target: "game" }));
-  }, [bet, deck, dispatch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bet, deck]);
 
   const end = useCallback(() => {
     setGameStarted(false);
     setRound(0);
+    setLastGame(gameCards);
     dispatch(clearCards({ target: "game" }));
 
     const hand = checkHand(gameCards);
     const win = hand.multiplier * bet;
-    setResultMessage(`${profile.name} ${win > 0 ? `won ${win}$ with a ${hand.name}` : `lost ${bet}$`}`);
+    setHistory([...history, `${profile.name} ${win > 0 ? `won ${win}$ with a ${hand.name}` : `lost ${bet}$`}`]);
 
     addFunds(win);
-  }, [bet, profile, dispatch, gameCards]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bet, profile, gameCards]);
 
   useEffect(() => {
     if (gameStarted && round === 3) {
       end();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameStarted, round]);
 
   return (
-    <PokerContext.Provider value={{ bet, setBet, gameStarted, setGameStarted, round, setRound, resultMessage, setResultMessage, start, end }}>
-      <div className="Poker">
+    error ? <p>Error: {error.message} </p> : 
+    (isLoading ? <p>Loading ... </p> :
+      <PokerContext.Provider value={{ lastGame, setLastGame, history, setHistory, bet, setBet, gameStarted, setGameStarted, round, setRound, start, end }}>
         <h1>Poker Game</h1>
-        {isLoading && <p>Loading...</p>}
-        {error && <p>Error: {error.message}</p>}
-
-        {resultMessage && <p>{resultMessage}</p>}
-
-        <Paytable />
-        <Betting />
-        <Game />
-
-        <button onClick={() => navigate("/")}>Home</button>
-      </div>
-    </PokerContext.Provider>
-  );
+        <div className="Poker">
+          <Paytable />
+          <Controls />
+          <History />
+          <Game />
+        </div>
+      </PokerContext.Provider>
+  ));
 }
 
 export default Poker;

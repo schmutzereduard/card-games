@@ -1,13 +1,3 @@
 .Poker {
-    background-color: black;
-    -webkit-text-fill-color: white;
-}
-
-.Paytable {
-    -webkit-text-fill-color: black;
-    background-color: white;
-}
-
-#start-game {
-    color: red;
+    display: flex;
 }
