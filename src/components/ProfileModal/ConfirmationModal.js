@@ -1,4 +1,4 @@
-function ConfirmationModal({ isOpen, onConfirm, onClose }) {
+function ConfirmationModal({ isOpen, onConfirm, onClose, message }) {
 
     if (!isOpen) return null;
 
@@ -6,7 +6,7 @@ function ConfirmationModal({ isOpen, onConfirm, onClose }) {
     return (
         <div style={styles.modalOverlay}>
             <div style={styles.modalContent}>
-                <p>Are you sure?</p>
+                <p>{message}</p>
                 <button onClick={onConfirm}>Yes</button>
                 <button onClick={onClose}>No</button>
             </div>

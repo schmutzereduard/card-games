@@ -21,6 +21,7 @@ function Poker() {
   const [round, setRound] = useState(0);
   const [history, setHistory] = useState([]);
   const [lastGame, setLastGame] = useState([]);
+  const [selectedCards, setSelectedCards] = useState([]);
 
   useEffect(() => {
     if (!deck) {
@@ -42,6 +43,7 @@ function Poker() {
   const end = useCallback(() => {
     setGameStarted(false);
     setRound(0);
+    setSelectedCards([]);
     setLastGame(gameCards);
     dispatch(clearCards({ target: "game" }));
 
@@ -61,18 +63,22 @@ function Poker() {
   }, [gameStarted, round]);
 
   return (
-    error ? <p>Error: {error.message} </p> : 
-    (isLoading ? <p>Loading ... </p> :
-      <PokerContext.Provider value={{ lastGame, setLastGame, history, setHistory, bet, setBet, gameStarted, setGameStarted, round, setRound, start, end }}>
-        <h1>Poker Game</h1>
-        <div className="Poker">
-          <Paytable />
-          <Controls />
-          <History />
-          <Game />
-        </div>
-      </PokerContext.Provider>
-  ));
+    error ? <p>Error: {error.message} </p> :
+      (isLoading ? <p>Loading ... </p> :
+        <PokerContext.Provider value={{ selectedCards, setSelectedCards, lastGame, setLastGame, history, setHistory, bet, setBet, gameStarted, setGameStarted, round, setRound, start, end }}>
+          <h1>Poker Game</h1>
+          <div className="Poker">
+            <div className="Sidebar">
+              <Paytable />
+              <Controls />
+            </div>
+            <div className="Game-Container">
+              <Game />
+              <History />
+            </div>
+          </div>
+        </PokerContext.Provider>
+      ));
 }
 
 export default Poker;

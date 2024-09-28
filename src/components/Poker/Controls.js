@@ -1,16 +1,20 @@
 import { useContext, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from 'react-router-dom';
 import { PokerContext } from "./Poker";
 import { getProfile } from "../../utils/LocalStorage";
-import './Poker.css';
+import { changeCards } from "../../features/deckSlice";
 import ConfirmationModal from "../ProfileModal/ConfirmationModal";
+import './Poker.css';
 
 function Controls() {
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const betRef = useRef(null);
     const profile = getProfile();
-    const { bet, setBet, gameStarted, start, end } = useContext(PokerContext);
+    const deck = useSelector((state) => state.deck.deck);
+    const { selectedCards, setSelectedCards, round, setRound, bet, setBet, gameStarted, start, end } = useContext(PokerContext);
     const [endGameModalOpen, setEndGameModalOpen] = useState(false);
     const [returnHomeModalOpen, setReturnHomeModalOpen] = useState(false);
 
@@ -27,6 +31,17 @@ function Controls() {
     const handleConfirmEndButtonClick = () => {
         setEndGameModalOpen(false);
         end();
+    }
+
+    const handleChangeClick = () => {
+        setRound(round + 1);
+        setSelectedCards([]);
+        dispatch(changeCards({
+            deckId: deck.deck_id,
+            count: selectedCards.length,
+            targetHand: "game",
+            targetCards: selectedCards
+        }));
     }
 
     const handleHomeButtonClick = () => {
@@ -67,15 +82,18 @@ function Controls() {
 
     return profile ? (
         <div id="controls-wrapper">
-            <h2>Controls: </h2>
+            <h2>Controls</h2>
             <label>Funds: {profile.funds}$</label>
             <br />
             <input onChange={handleInputChange} ref={betRef} value= {bet} type="number" placeholder="Place your bet" disabled={gameStarted} />
             <br />
-            <button id="start-game" onClick={handleStartButtonClick}>{gameStarted ? "End Game" : "Start Game"}</button>
-            <ConfirmationModal isOpen={endGameModalOpen} onConfirm={handleConfirmEndButtonClick} onClose={() => setEndGameModalOpen(false)} />
+            <button id="start-game" className={gameStarted ? "red-button" : ""}onClick={handleStartButtonClick}>{gameStarted ? "End Game" : "Start Game"}</button>
+            <ConfirmationModal message="Are you sure you want to end the game?" isOpen={endGameModalOpen} onConfirm={handleConfirmEndButtonClick} onClose={() => setEndGameModalOpen(false)} />
+            <br />
+            <button hidden={!gameStarted} onClick={handleChangeClick}>Change Cards</button>
+            <br />
             <button id="home" onClick={() => setReturnHomeModalOpen(true)}>Home</button>
-            <ConfirmationModal isOpen={returnHomeModalOpen} onConfirm={handleHomeButtonClick} onClose={() => setReturnHomeModalOpen(false)} />
+            <ConfirmationModal message="Are you sure you want to go Home? This will end your current game" isOpen={returnHomeModalOpen} onConfirm={handleHomeButtonClick} onClose={() => setReturnHomeModalOpen(false)} />
         </div>
     ) : null;
 }

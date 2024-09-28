@@ -3,14 +3,13 @@ import { HANDS } from "./Hands";
 import { PokerContext } from "./Poker";
 import './Poker.css';
 
-
 function Paytable() {
 
     const { bet } = useContext(PokerContext);
 
     return (
         <div className="Paytable">
-            <h2>Paytable: </h2>
+            <h2>Paytable</h2>
             <table>
                 <thead>
                     <tr>

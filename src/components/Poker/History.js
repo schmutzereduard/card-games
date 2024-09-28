@@ -7,7 +7,7 @@ function History() {
 
     return (history.length > 0 &&
         <div id="history">
-            <h2>History: </h2>
+            <h2>History</h2>
             <ol>
                 {history.map((hand, index) =>
                     <li key={index}>{hand}</li>)}

@@ -1,21 +1,11 @@
-import { useContext, useEffect, useState } from "react";
-import { useSelector, useDispatch } from 'react-redux';
-import { changeCards } from "../../features/deckSlice";
+import { useContext } from "react";
+import { useSelector } from 'react-redux';
 import { PokerContext } from "./Poker";
 import { CARD_BACK_URL } from "../../Constants";
 
 function Game() {
-    const dispatch = useDispatch();
-    const { gameStarted, round, setRound, lastGame } = useContext(PokerContext);
-    const [selectedCards, setSelectedCards] = useState([]);
-    const deck = useSelector((state) => state.deck.deck);
+    const { gameStarted, round, lastGame, selectedCards, setSelectedCards } = useContext(PokerContext);
     const gameCards = useSelector((state) => state.deck.gameCards);
-
-    useEffect(() => {
-        if (!gameStarted) {
-            setSelectedCards([]);
-        }
-    }, [gameStarted, gameCards]);
 
     const handleCardClick = (card) => {
         setSelectedCards((prevSelected) => {
@@ -28,17 +18,6 @@ function Game() {
             }
         });
     };
-
-    const handleChangeClick = () => {
-        setRound(round + 1);
-        setSelectedCards([]);
-        dispatch(changeCards({
-            deckId: deck.deck_id,
-            count: selectedCards.length,
-            targetHand: "game",
-            targetCards: selectedCards
-        }));
-    }
 
     return (
         <div id="game-wrapper">
@@ -55,10 +34,9 @@ function Game() {
                         />
                     );
                 })}
-                <button hidden={!gameStarted} onClick={handleChangeClick}>Change C</button>
             </div>
             <div id="last-game">
-                {lastGame.length > 0 && <h2>Last Game: </h2>}
+                {lastGame.length > 0 && <h2>Last Game</h2>}
                 {lastGame.length > 0 && lastGame.map((card, index) =>
                     <img
                         key={index}
