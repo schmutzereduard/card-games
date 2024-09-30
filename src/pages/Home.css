@@ -5,7 +5,6 @@
     align-items: center;     /* Horizontally center the items */
     height: 100vh;           /* Full viewport height */
     text-align: center;      /* Centers the text */
-    background-color: black;
 }
 
 .App-logo {

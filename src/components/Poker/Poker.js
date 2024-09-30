@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { createContext, useCallback, useEffect, useState } from 'react';
+import { createContext, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { drawCards, clearCards, shuffleDeck } from "../../features/deckSlice";
 import { getProfile, extractFunds, addFunds } from '../../utils/LocalStorage';
@@ -22,13 +22,18 @@ function Poker() {
   const [history, setHistory] = useState([]);
   const [lastGame, setLastGame] = useState([]);
   const [selectedCards, setSelectedCards] = useState([]);
+  const gameCardsRef = useRef(gameCards);
+
+  useEffect(() => {
+    // Keep the ref updated with the latest gameCards
+    gameCardsRef.current = gameCards;
+  }, [gameCards]);
 
   useEffect(() => {
     if (!deck) {
       dispatch(shuffleDeck({ deckId: profile.deckId }));
     }
-  }
-    , [deck, profile]);
+  }, [deck, profile]);
 
   const start = useCallback(() => {
     extractFunds(bet);
@@ -41,25 +46,41 @@ function Poker() {
   }, [bet, deck]);
 
   const end = useCallback(() => {
-    setGameStarted(false);
-    setRound(0);
-    setSelectedCards([]);
-    setLastGame(gameCards);
-    dispatch(clearCards({ target: "game" }));
-
-    const hand = checkHand(gameCards);
+    console.log("end: " + new Date());
+      gameCardsRef.current.forEach(element => {
+        console.log(element.value + element.suit);
+      });
+    // Save the last game state immediately
+    setLastGame([...gameCardsRef.current]); 
+  
+    const hand = checkHand(gameCardsRef.current);
     const win = hand.multiplier * bet;
+  
+    // Update the history
     setHistory([...history, `${profile.name} ${win > 0 ? `won ${win}$ with a ${hand.name}` : `lost ${bet}$`}`]);
-
+    
     addFunds(win);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  
+    // Delay clearing only the game cards (not lastGame)
+    setTimeout(() => {
+      setGameStarted(false);  // This will stop the current game
+      setRound(0);
+      setSelectedCards([]);
+      dispatch(clearCards({ target: "game" }));  // Only clear gameCards, leave lastGame as is
+    }, 2000);  // 2-second delay before clearing the current game cards
   }, [bet, profile, gameCards]);
 
   useEffect(() => {
     if (gameStarted && round === 3) {
-      end();
+      console.log("useEffect: " + new Date());
+      gameCardsRef.current.forEach(element => {
+        console.log(element.value + element.suit);
+      });
+      // Delay the end of the game to allow card updates
+      setTimeout(() => {
+        end();
+      }, 3000); // 1 second delay
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameStarted, round]);
 
   return (

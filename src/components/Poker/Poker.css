@@ -1,31 +1,42 @@
 .Poker {
     display: flex;
-    justify-content: space-between; /* Sidebar on the left, game content on the right */
-    align-items: flex-start; /* Aligns both sections to the top */
-    height: 100vh; /* Full viewport height */
+    justify-content: space-between;
+    /* Sidebar on the left, game content on the right */
+    align-items: flex-start;
+    /* Aligns both sections to the top */
+    height: 100vh;
+    /* Full viewport height */
 }
 
 .Sidebar {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* Align sidebar content to the top */
+    justify-content: flex-start;
+    /* Align sidebar content to the top */
     text-align: center;
     align-items: center;
-    width: 200px; /* Fixed width for the sidebar */
+    width: 200px;
+    /* Fixed width for the sidebar */
 }
 
 .Game-Container {
     display: flex;
     flex-direction: row;
-    justify-content: flex-start; /* Align the game section content to the top */
-    align-items: flex-start; /* Aligns both the cards and history at the top */
+    justify-content: flex-start;
+    /* Align the game section content to the top */
+    align-items: flex-start;
+    /* Aligns both the cards and history at the top */
     text-align: center;
-    width: calc(100% - 200px); /* Ensure the game container takes up the remaining space */
-    margin-left: auto; /* Pushes the game container away from the sidebar */
+    width: calc(100% - 200px);
+    /* Ensure the game container takes up the remaining space */
+    margin-left: auto;
+    /* Pushes the game container away from the sidebar */
 }
 
-#current-game, #history {
-    margin-right: 20px; /* Add space between the game and history, if needed */
+#current-game,
+#history {
+    margin-right: 20px;
+    /* Add space between the game and history, if needed */
 }
 
 

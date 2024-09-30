@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { drawFromDeck, fetchNewDeck, shuffleTheDeck } from '../api/deckApi';
-import { getProfile, saveProfile } from '../utils/LocalStorage';
 // Thunk to fetch a new deck from the Deck of Cards API
 export const fetchDeck = createAsyncThunk(
   'deck/fetchDeck', //creates 3 subactions: fetchDeck.pending, fetchDeck.fufilled, fetchDeck.rejected
@@ -61,7 +60,6 @@ const deckSlice = createSlice({
       .addCase(fetchDeck.fulfilled, (state, action) => {
         state.deck = action.payload;
         state.isLoading = false;
-        saveProfile({...getProfile(), deckId: action.payload.deck_id});
       })
       .addCase(fetchDeck.rejected, (state, action) => {
         state.error = action.error;
@@ -100,15 +98,15 @@ const deckSlice = createSlice({
         const { cards } = action.payload;
         const { targetHand, targetCards } = action.meta.arg;
         if (targetHand === "game") {
-          state.gameCards = [
-            ...state.gameCards.filter(card => !targetCards.some(selectedCard => selectedCard.code === card.code)),
-            ...cards
-          ];
+          state.gameCards = state.gameCards.map(card => {
+            const targetIndex = targetCards.findIndex(selectedCard => selectedCard.code === card.code);
+            return targetIndex !== -1 ? cards[targetIndex] : card;
+          });
         } else if (action.meta.arg.target === "player") {
-          state.playerCards = [
-            ...state.playerCards.filter(card => !targetCards.some(selectedCard => selectedCard.code === card.code)),
-            ...cards
-          ];
+          state.playerCards = state.playerCards.map(card => {
+            const targetIndex = targetCards.findIndex(selectedCard => selectedCard.code === card.code);
+            return targetIndex !== -1 ? cards[targetIndex] : card;
+          });
         }
         state.isLoading = false;
       })

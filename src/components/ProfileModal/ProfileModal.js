@@ -1,5 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { deleteProfile, getProfile, saveProfile } from "../../utils/LocalStorage";
+import { fetchDeck } from "../../features/deckSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 function ProfileModal({ isOpen, onClose }) {
 
@@ -10,39 +12,57 @@ function ProfileModal({ isOpen, onClose }) {
     return profile ? (<Profile profile={profile} onClose={onClose} />) : (<CreateProfile onClose={onClose} />);
 }
 
-function CreateProfile({onClose}) {
+function CreateProfile({ onClose }) {
 
+    const dispatch = useDispatch();
+    const { deck } = useSelector((state) => state.deck);
     const nameRef = useRef(null);
     const startingFundsRef = useRef(null);
     const deckIdRef = useRef(null);
+    const [alert, setAlert] = useState("");
 
     useEffect(() => {
         nameRef.current.focus();
     }, []);
+
+    const handleGenerateButtonClick = async () => {
+        if (deck) { //Avoid spamming the API if user keeps logging out
+            deckIdRef.current.value = deck.deck_id;
+        } else {
+            try {
+                const response = await dispatch(fetchDeck()).unwrap();  // Unwrap the response to get the data
+                deckIdRef.current.value = response.deck_id;  // Set the deck ID once the promise resolves
+            } catch (error) {
+                console.error("Failed to fetch deck:", error);
+                setAlert("Failed to generate deck. Please try again.");
+            }
+        }
+    };
+
 
 
     const handleCreateButtonClick = () => {
         const name = nameRef.current.value;
         const funds = startingFundsRef.current.value;
         const deckId = deckIdRef.current.value;
-    
-        if (name === "" || funds === "") {
-            alert("Please enter a name and choose your starting funds!");
+
+        if (name === "") {
+            setAlert("Please enter a name!");
             return;
         }
-    
-        const fundsValue = parseInt(funds, 10);
-        if (fundsValue < 1 || fundsValue > 100) {
-            alert("Funds must be between 1 and 100!");
+
+        if (deckId === "") {
+            setAlert("Please enter a Deck Id or generate one by pressing 'Deck ID'!")
             return;
         }
-    
+
         const profileInfo = {
             name: name,
-            funds: fundsValue,
+            funds: funds,
             deckId: deckId
         };
-    
+
+        setAlert("");
         saveProfile(profileInfo);
         onClose();
     };
@@ -50,16 +70,18 @@ function CreateProfile({onClose}) {
     return (
         <div style={styles.modalOverlay}>
             <div style={styles.modalContent}>
+                <p>{alert}</p>
                 <label>Name: </label>
                 <input ref={nameRef} placeholder="Enter your name" />
                 <br />
 
                 <label>Funds: </label>
-                <input value={100} disabled={true}ref={startingFundsRef} type="number" placeholder="Enter your starting funds"/>
+                <input value={100} disabled={true} ref={startingFundsRef} type="number" placeholder="Enter your starting funds" />
                 <br />
 
-                <label>Deck ID: </label>
+                <label onClick={handleGenerateButtonClick}>Deck ID: </label>
                 <input ref={deckIdRef} placeholder="Already have a Deck ID?" />
+                <br />
                 <br />
 
                 <button onClick={handleCreateButtonClick}>Create</button>
