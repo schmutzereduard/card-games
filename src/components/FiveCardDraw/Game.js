@@ -1,10 +1,10 @@
 import { useContext } from "react";
 import { useSelector } from 'react-redux';
-import { PokerContext } from "./Poker";
+import { FiveCardDrawContext } from "./FiveCardDraw";
 import { CARD_BACK_URL } from "../../Constants";
 
 function Game() {
-    const { gameStarted, round, lastGame, selectedCards, setSelectedCards } = useContext(PokerContext);
+    const { gameStarted, round, lastGame, selectedCards, setSelectedCards } = useContext(FiveCardDrawContext);
     const gameCards = useSelector((state) => state.deck.gameCards);
 
     const handleCardClick = (card) => {

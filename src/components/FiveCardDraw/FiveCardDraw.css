@@ -1,4 +1,4 @@
-.Poker {
+.FiveCardDraw {
     display: flex;
     justify-content: space-between;
     /* Sidebar on the left, game content on the right */

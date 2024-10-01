@@ -29,8 +29,8 @@ function Home() {
                 {profile ? ( 
                 <div className="games-wrapper">
                     <h2>Games:</h2>
-                    <button onClick={() => navigate("/poker")}>Poker</button>
-                    <button onClick={() => navigate("/blackjack")}>BlackJack</button>
+                    <button onClick={() => navigate("/five-card-draw")}>Five Card Draw</button>
+                    <button onClick={() => navigate("/hold-em")}>Hold'em</button>
                 </div>) : (
                     <p>Please create a profile</p>
                 )}

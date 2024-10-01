@@ -8,11 +8,11 @@ import Paytable from './Paytable';
 import History from './History';
 import Controls from './Controls';
 import Game from './Game';
-import './Poker.css';
+import './FiveCardDraw.css';
 
-export const PokerContext = createContext(null);
+export const FiveCardDrawContext = createContext(null);
 
-function Poker() {
+function FiveCardDraw() {
   const profile = getProfile();
   const { deck, isLoading, error, gameCards } = useSelector((state) => state.deck);
   const dispatch = useDispatch();
@@ -86,9 +86,9 @@ function Poker() {
   return (
     error ? <p>Error: {error.message} </p> :
       (isLoading ? <p>Loading ... </p> :
-        <PokerContext.Provider value={{ selectedCards, setSelectedCards, lastGame, setLastGame, history, setHistory, bet, setBet, gameStarted, setGameStarted, round, setRound, start, end }}>
-          <h1>Poker Game</h1>
-          <div className="Poker">
+        <FiveCardDrawContext.Provider value={{ selectedCards, setSelectedCards, lastGame, setLastGame, history, setHistory, bet, setBet, gameStarted, setGameStarted, round, setRound, start, end }}>
+          <h1>Five Card Draw</h1>
+          <div className="FiveCardDraw">
             <div className="Sidebar">
               <Paytable />
               <Controls />
@@ -98,8 +98,8 @@ function Poker() {
               <History />
             </div>
           </div>
-        </PokerContext.Provider>
+        </FiveCardDrawContext.Provider>
       ));
 }
 
-export default Poker;
+export default FiveCardDraw;

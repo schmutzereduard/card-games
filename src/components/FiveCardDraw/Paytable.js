@@ -1,11 +1,11 @@
 import { useContext } from "react";
 import { HANDS } from "./Hands";
-import { PokerContext } from "./Poker";
-import './Poker.css';
+import { FiveCardDrawContext } from "./FiveCardDraw";
+import './FiveCardDraw';
 
 function Paytable() {
 
-    const { bet } = useContext(PokerContext);
+    const { bet } = useContext(FiveCardDrawContext);
 
     return (
         <div className="Paytable">

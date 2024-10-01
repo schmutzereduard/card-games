@@ -1,11 +1,11 @@
 import { useContext, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from 'react-router-dom';
-import { PokerContext } from "./Poker";
+import { FiveCardDrawContext } from "./FiveCardDraw";
 import { getProfile } from "../../utils/LocalStorage";
 import { changeCards } from "../../features/deckSlice";
 import ConfirmationModal from "../ProfileModal/ConfirmationModal";
-import './Poker.css';
+import './FiveCardDraw';
 
 function Controls() {
 
@@ -14,7 +14,7 @@ function Controls() {
     const dispatch = useDispatch();
     const betRef = useRef(null);
     const deck = useSelector((state) => state.deck.deck);
-    const { selectedCards, setSelectedCards, round, setRound, bet, setBet, gameStarted, start, end } = useContext(PokerContext);
+    const { selectedCards, setSelectedCards, round, setRound, bet, setBet, gameStarted, start, end } = useContext(FiveCardDrawContext);
     const [endModalOpen, setEndModalOpen] = useState(false);
     const [homeModalOpen, setHomeModalOpen] = useState(false);
     const [alert, setAlert] = useState("");

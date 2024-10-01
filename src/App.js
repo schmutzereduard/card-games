@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './pages/Home';
-import Poker from './components/Poker/Poker';  // Example for a card game
-import BlackJack from './components/BlackJack/BlackJack';  // Another game example
+import FiveCardDraw from './components/FiveCardDraw/FiveCardDraw';  // Example for a card game
+import Holdem from './components/Holdem/Holdem';  // Another game example
 
 function App() {
   return (
@@ -10,8 +10,8 @@ function App() {
       <div>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/poker" element={<Poker />} />
-          <Route path="/blackjack" element={<BlackJack />} />
+          <Route path="/five-card-draw" element={<FiveCardDraw />} />
+          <Route path="/hold-em" element={<Holdem />} />
         </Routes>
       </div>
     </Router>

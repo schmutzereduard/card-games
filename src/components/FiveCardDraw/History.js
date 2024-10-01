@@ -1,9 +1,9 @@
 import { useContext } from "react";
-import { PokerContext } from "./Poker";
+import { FiveCardDrawContext } from "./FiveCardDraw";
 
 function History() {
 
-    const { history } = useContext(PokerContext);
+    const { history } = useContext(FiveCardDrawContext);
 
     return (history.length > 0 &&
         <div id="history">
