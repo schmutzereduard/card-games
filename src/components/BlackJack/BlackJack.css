@@ -1,0 +1,22 @@
+.BlackJack {
+    display: flex;
+}
+
+.Controls {
+    display: flex;
+    flex-direction: column;
+}
+
+.Controls-Wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+.red-button {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
