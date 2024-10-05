@@ -2,10 +2,14 @@ import { useEffect, useContext, useReducer, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BlackJackContext } from "./BlackJack";
 import { getProfile } from "../../utils/LocalStorage";
+import { useDispatch, useSelector } from "react-redux";
+import { drawCards } from "../../features/deckSlice";
+import { busted } from "./Utils";
+
+
 
 const buttonsHoverState = {
     start: false,
-    surrender: false,
     hit: false,
     stand: false,
     doubleDown: false,
@@ -28,30 +32,30 @@ function Controls() {
 
     const profile = getProfile();
     const navigate = useNavigate();
-    const { gameStarted, setGameStarted } = useContext(BlackJackContext);
+    const reduxDispatch = useDispatch();
+    const { deck, playerCards } = useSelector((state) => state.deck);
+    const { start, end, gameStarted, setGameStarted, playerTurn, setPlayerTurn, playerValue, daalerValue } = useContext(BlackJackContext);
     const [betAlert, setBetAlert] = useState("");
     const [controlTips, setControlTips] = useState("");
-    const [state, dispatch] = useReducer(buttonHoverReducer, buttonsHoverState);
+    const [buttonsState, buttonsDispatch] = useReducer(buttonHoverReducer, buttonsHoverState);
 
     useEffect(() => {
-        if (state.start) {
-            setControlTips("Start the game");
-        } else if (state.surrender) {
-            setControlTips("Forfeit half the bet and end the round");
-        } else if (state.hit) {
+        if (buttonsState.start) {
+            setControlTips(gameStarted ? "Forfeit half the bet and end the round" : "Start the game");
+        } else if (buttonsState.hit) {
             setControlTips("Draw another card to get closer to 21");
-        } else if (state.stand) {
+        } else if (buttonsState.stand) {
             setControlTips("Keep the current total and end the turn");
-        } else if (state.doubleDown) {
+        } else if (buttonsState.doubleDown) {
             setControlTips("Double the initial bet, draw exactly one more card, and then stand");
-        } else if (state.split) {
+        } else if (buttonsState.split) {
             setControlTips("Split the cards into two separate hands, doubling the bet");
-        } else if (state.home) {
+        } else if (buttonsState.home) {
             setControlTips("Go back to the home page");
         } else {
             setControlTips("");
         }
-    }, [state]);
+    }, [gameStarted, buttonsState]);
 
     const handleStartButton = () => {
         if (!gameStarted)
@@ -60,20 +64,41 @@ function Controls() {
             end();
     }
 
-    const start = () => {
-        setGameStarted(true);
-    }
-
-    const end = () => {
-        setGameStarted(false);
-    }
+    
 
     const handleButtonHoverOn = (button) => {
-        dispatch({ type: "HOVER_ON", button: button });
+        buttonsDispatch({ type: "HOVER_ON", button: button });
     }
 
     const handleButtonHoverOff = (button) => {
-        dispatch({ type: "HOVER_OFF", button: button });
+        buttonsDispatch({ type: "HOVER_OFF", button: button });
+    }
+
+    const hit = () => {
+        reduxDispatch(drawCards({ deckId: deck.deck_id, count: 1, target: "player" }));
+    }
+
+    const stand = () => {
+        setPlayerTurn(false);
+    }
+
+    const doubleDown = () => {
+        hit();
+        stand();
+    }
+
+    const canSplit = () => {
+
+        let uniqueCard = null;
+
+        for (let card of playerCards) {
+            if (uniqueCard === null)
+                uniqueCard = card.value;
+            else if (card.value !== uniqueCard)
+                return false;
+        }
+
+        return true;
     }
 
     return (
@@ -86,10 +111,10 @@ function Controls() {
                 <input disabled={gameStarted} placeholder="Place your bet..." />
             </div>
             <div className="Controls-Wrapper">
-                <p>{controlTips}</p>
+            <p>{controlTips}</p>
                 <button
-                    onMouseEnter={() => handleButtonHoverOn(gameStarted ? "surrender" : "start")}
-                    onMouseLeave={() => handleButtonHoverOff(gameStarted ? "surrender" : "start")}
+                    onMouseEnter={() => handleButtonHoverOn("start")}
+                    onMouseLeave={() => handleButtonHoverOff("start")}
                     className={gameStarted ? "red-button" : ""}
                     onClick={handleStartButton}>
                         {gameStarted ? "Surrender" : "Start"}
@@ -97,23 +122,30 @@ function Controls() {
                 <button
                     onMouseEnter={() => handleButtonHoverOn("hit")}
                     onMouseLeave={() => handleButtonHoverOff("hit")}
-                    hidden={!gameStarted}>
+                    onClick={hit}
+                    hidden={!gameStarted}
+                    disabled={busted(playerValue) || !playerTurn}>
                         Hit
                 </button>
                 <button
                     onMouseEnter={() => handleButtonHoverOn("stand")}
                     onMouseLeave={() => handleButtonHoverOff("stand")}
-                    hidden={!gameStarted}>
+                    onClick={stand}
+                    hidden={!gameStarted}
+                    disabled={busted(playerValue) || !playerTurn}>
                         Stand
                 </button>
                 <button
                     hidden={!gameStarted}
                     onMouseEnter={() => handleButtonHoverOn("doubleDown")}
-                    onMouseLeave={() => handleButtonHoverOff("doubleDown")}>
+                    onMouseLeave={() => handleButtonHoverOff("doubleDown")}
+                    onClick={doubleDown}
+                    disabled={busted(playerValue) || !playerTurn}>
                         Double Down
                 </button>
                 <button
                     hidden={!gameStarted}
+                    disabled={busted(playerValue) || !canSplit() || !playerTurn}
                     onMouseEnter={() => handleButtonHoverOn("split")}
                     onMouseLeave={() => handleButtonHoverOff("split")}>
                         Split

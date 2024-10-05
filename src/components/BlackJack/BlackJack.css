@@ -12,11 +12,35 @@
     flex-direction: column;
 }
 
-.red-button {
+.Controls-Wrapper p {
+    margin-top: 30px;
+    min-height: 90px;/* Adjust this height as needed based on your alert text size */
+    margin-bottom: 10px;/* Space between alert and buttons */
+    width: 150px; /* Set a fixed width to match the buttons */
+    word-wrap: break-word; /* Ensure long text wraps to the next line */
+    text-align: center; /* Optional: center-align the text */
+}
+
+.Controls-Wrapper button {
+    width: 150px;
+    /* Fixed width for all buttons */
+    padding: 10px;
+    margin: 5px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.Controls-Wrapper button.red-button {
     background-color: red;
     color: white;
     border: none;
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
+}
+
+.Controls-Wrapper button:disabled {
+    background-color: gray;
+    /* Style for disabled buttons */
+    cursor: not-allowed;
 }

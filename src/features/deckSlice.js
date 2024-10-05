@@ -81,9 +81,9 @@ const deckSlice = createSlice({
       })
       .addCase(drawCards.fulfilled, (state, action) => {
         if (action.meta.arg.target === "game") {
-          state.gameCards = action.payload.cards; // Access payload.cards
+          state.gameCards = [...state.gameCards, ...action.payload.cards]; // Access payload.cards
         } else if (action.meta.arg.target === "player") {
-          state.playerCards = action.payload.cards; // Access payload.cards
+          state.playerCards = [...state.playerCards, ...action.payload.cards]; // Access payload.cards
         }
         state.isLoading = false;
       })
