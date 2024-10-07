@@ -7,12 +7,16 @@
     flex-direction: column;
 }
 
+.Bet-Wrapper input{
+    width: 100px;
+}
+
 .Controls-Wrapper {
     display: flex;
     flex-direction: column;
 }
 
-.Controls-Wrapper p {
+.Alert-Wrapper p {
     margin-top: 30px;
     min-height: 90px;/* Adjust this height as needed based on your alert text size */
     margin-bottom: 10px;/* Space between alert and buttons */

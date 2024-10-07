@@ -1,4 +1,4 @@
-import { useEffect, useContext, useReducer, useState } from "react";
+import { useEffect, useContext, useReducer, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { BlackJackContext } from "./BlackJack";
 import { getProfile } from "../../utils/LocalStorage";
@@ -34,37 +34,63 @@ function Controls() {
     const navigate = useNavigate();
     const reduxDispatch = useDispatch();
     const { deck, playerCards } = useSelector((state) => state.deck);
-    const { start, end, gameStarted, setGameStarted, playerTurn, setPlayerTurn, playerValue, daalerValue } = useContext(BlackJackContext);
-    const [betAlert, setBetAlert] = useState("");
-    const [controlTips, setControlTips] = useState("");
+    const { start, end, gameStarted, playerTurn, setPlayerTurn, playerValue, dealerTurn, setDealerTurn, dealerValue, betValue, setBetValue } = useContext(BlackJackContext);
+    const [alert, setAlert] = useState("");
     const [buttonsState, buttonsDispatch] = useReducer(buttonHoverReducer, buttonsHoverState);
+    const betRef = useRef(null);
 
     useEffect(() => {
         if (buttonsState.start) {
-            setControlTips(gameStarted ? "Forfeit half the bet and end the round" : "Start the game");
+            setAlert(gameStarted ? "Forfeit half the bet and end the round" : "Start the game");
         } else if (buttonsState.hit) {
-            setControlTips("Draw another card to get closer to 21");
+            setAlert("Draw another card to get closer to 21");
         } else if (buttonsState.stand) {
-            setControlTips("Keep the current total and end the turn");
+            setAlert("Keep the current total and end the turn");
         } else if (buttonsState.doubleDown) {
-            setControlTips("Double the initial bet, draw exactly one more card, and then stand");
+            setAlert("Double the initial bet, draw exactly one more card, and then stand");
         } else if (buttonsState.split) {
-            setControlTips("Split the cards into two separate hands, doubling the bet");
+            setAlert("Split the cards into two separate hands, doubling the bet");
         } else if (buttonsState.home) {
-            setControlTips("Go back to the home page");
+            setAlert("Go back to the home page");
         } else {
-            setControlTips("");
+            setAlert("");
         }
     }, [gameStarted, buttonsState]);
 
     const handleStartButton = () => {
         if (!gameStarted)
-            start();
+            validateBet() && start();
         else
             end();
     }
 
-    
+    const validateBet = () => {
+
+        const betValue = betRef.current.value;
+
+        if (betValue === "") {
+            setAlert("Bet empty !");
+            return false;
+        }
+
+        if (betValue.startsWith("0")) {
+            setAlert("Bet cannot start with 0 !");
+            return false;
+        }
+
+        if (betValue < -1) {
+            setAlert("Bet value must be pozitive !");
+            return false;
+        }
+
+        if (betValue > profile.funds) {
+            setAlert("Insufficient funds !");
+            return false;
+        }
+
+        setAlert("");
+        return true;
+    }
 
     const handleButtonHoverOn = (button) => {
         buttonsDispatch({ type: "HOVER_ON", button: button });
@@ -74,17 +100,23 @@ function Controls() {
         buttonsDispatch({ type: "HOVER_OFF", button: button });
     }
 
-    const hit = () => {
-        reduxDispatch(drawCards({ deckId: deck.deck_id, count: 1, target: "player" }));
-    }
+    const hit = useCallback((target) => {
+        reduxDispatch(drawCards({ deckId: deck.deck_id, count: 1, target: target }));
+    }, [deck, reduxDispatch]);
 
-    const stand = () => {
-        setPlayerTurn(false);
-    }
+    const stand = useCallback((target) => {
+        if (target === "player") {
+            setPlayerTurn(false);
+            setDealerTurn(true);
+        } else if (target === "game") {
+            setDealerTurn(false);
+        }
+    }, [setPlayerTurn, setDealerTurn]);
 
     const doubleDown = () => {
-        hit();
-        stand();
+        setBetValue(betValue * 2);
+        hit("player");
+        stand("player");
     }
 
     const canSplit = () => {
@@ -101,60 +133,87 @@ function Controls() {
         return true;
     }
 
+    const canDoubleDown = () => {
+        return betValue * 2 < profile.funds;
+    }
+
+    const dealerAutoPlay = useCallback(() => {
+        if (dealerValue <= 16)
+            hit("game");
+        if (dealerValue >= 17) {
+            stand("game");
+            end();
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dealerValue, hit, stand]);
+
+    useEffect(() => {
+        if (dealerTurn)
+            dealerAutoPlay();
+    }, [dealerTurn, dealerAutoPlay]);
+
     return (
         <div className="Controls">
             <h2>Controls</h2>
             <label>Funds: {profile.funds}$</label>
             <div className="Bet-Wrapper">
-                <p>{betAlert}</p>
                 <label>Bet: </label>
-                <input disabled={gameStarted} placeholder="Place your bet..." />
+                <input
+                    ref={betRef}
+                    type="number"
+                    value={betValue}
+                    disabled={gameStarted}
+                    placeholder="Place your bet..."
+                    onChange={(event) => setBetValue(event.target.value)} />
+            </div>
+            <div className="Alert-Wrapper">
+                <p>{alert}</p>
             </div>
             <div className="Controls-Wrapper">
-            <p>{controlTips}</p>
+
                 <button
                     onMouseEnter={() => handleButtonHoverOn("start")}
                     onMouseLeave={() => handleButtonHoverOff("start")}
                     className={gameStarted ? "red-button" : ""}
                     onClick={handleStartButton}>
-                        {gameStarted ? "Surrender" : "Start"}
+                    {gameStarted ? "Surrender" : "Start"}
                 </button>
                 <button
                     onMouseEnter={() => handleButtonHoverOn("hit")}
                     onMouseLeave={() => handleButtonHoverOff("hit")}
-                    onClick={hit}
+                    onClick={() => hit("player")}
                     hidden={!gameStarted}
                     disabled={busted(playerValue) || !playerTurn}>
-                        Hit
+                    Hit
                 </button>
                 <button
                     onMouseEnter={() => handleButtonHoverOn("stand")}
                     onMouseLeave={() => handleButtonHoverOff("stand")}
-                    onClick={stand}
+                    onClick={() => stand("player")}
                     hidden={!gameStarted}
                     disabled={busted(playerValue) || !playerTurn}>
-                        Stand
+                    Stand
                 </button>
                 <button
                     hidden={!gameStarted}
                     onMouseEnter={() => handleButtonHoverOn("doubleDown")}
                     onMouseLeave={() => handleButtonHoverOff("doubleDown")}
                     onClick={doubleDown}
-                    disabled={busted(playerValue) || !playerTurn}>
-                        Double Down
+                    disabled={busted(playerValue) || !canDoubleDown() || !playerTurn}>
+                    Double Down
                 </button>
                 <button
                     hidden={!gameStarted}
                     disabled={busted(playerValue) || !canSplit() || !playerTurn}
                     onMouseEnter={() => handleButtonHoverOn("split")}
                     onMouseLeave={() => handleButtonHoverOff("split")}>
-                        Split
+                    Split
                 </button>
                 <button
                     onClick={() => navigate("/")}
                     onMouseEnter={() => handleButtonHoverOn("home")}
                     onMouseLeave={() => handleButtonHoverOff("home")}>
-                        Home
+                    Home
                 </button>
             </div>
         </div>
