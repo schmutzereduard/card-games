@@ -14,12 +14,12 @@ export function deleteProfile() {
 
 export function extractFunds(bet) {
     const profile = getProfile();
-    profile.funds -= bet;
+    profile.funds = Number.parseInt(profile.funds) - Number.parseInt(bet);
     saveProfile(profile);
 }
 
 export function addFunds(win) {
     const profile = getProfile();
-    profile.funds += win;
+    profile.funds = Number.parseInt(profile.funds) + Number.parseInt(win);
     saveProfile(profile);
 }

@@ -22,15 +22,7 @@ function BlackJack() {
     const [betValue, setBetValue] = useState(1);
     const [playerValue, setPlayerValue] = useState(0);
     const [dealerValue, setDealerValue] = useState(0);
-    const [winner, setWinner] = useState("");
-
-    useEffect(() => {
-        if ("player" === winner)
-            addFunds(betValue);
-        else if ("game" === winner)
-            extractFunds(betValue);
-
-    }, [betValue, winner]);
+    const [result, setResult] = useState("");
 
     useEffect(() => {
         setPlayerValue(handValue(playerCards));
@@ -40,6 +32,9 @@ function BlackJack() {
         setDealerValue(handValue(gameCards));
     }, [gameCards]);
 
+    
+
+
     useEffect(() => {
         if (!deck) {
             dispatch(shuffleDeck({ deckId: profile.deckId }));
@@ -47,54 +42,74 @@ function BlackJack() {
     }, [deck, profile, dispatch]);
 
     const start = useCallback(() => {
-        setWinner("");
-        dispatch(shuffleDeck({ deckId: deck.deck_id }));
+        setResult("");
         setGameStarted(true);
         setPlayerTurn(true);
         setDealerTurn(false);
+        dispatch(shuffleDeck({ deckId: deck.deck_id }));
         dispatch(drawCards({ deckId: deck.deck_id, count: 2, target: "player" }));
         dispatch(drawCards({ deckId: deck.deck_id, count: 1, target: "game" }));
     }, [deck, dispatch]);
 
-    const decideWinner = useCallback(() => {
+    const getResult = useCallback(() => {
         const playerDiff = 21 - playerValue;
         const dealerDiff = 21 - dealerValue;
 
-        if (playerDiff < dealerDiff && !busted(playerValue))
-            setWinner("player");
-        else if (dealerDiff < playerDiff && !busted(dealerValue))
-            setWinner("game");
+        if (busted(playerValue) || blackJack(dealerValue))
+            setResult("dealerWon");
+        else if (busted(dealerValue) || blackJack(playerValue))
+            setResult("playerWon");
+        else if (playerTurn && !dealerTurn)
+            setResult("forfeit");
+        else if (playerDiff < dealerDiff)
+            setResult("playerWon");
+        else if (dealerDiff < playerDiff)
+            setResult("dealerWon");
         else if (playerDiff === dealerDiff)
-            setWinner("tie");
-    }, [playerValue, dealerValue]);
+            setResult("tie");
+    }, [playerValue, dealerValue, playerTurn, dealerTurn]);
+
+    useEffect(() => {
+
+        switch(result) {
+            case "playerWon": addFunds(betValue); break;
+            case "dealerWon": extractFunds(betValue); break;
+            case "forfeit": extractFunds(betValue > 1 ? betValue / 2 : betValue); break;
+            case "tie": break;
+            default: break;
+        }
+        
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [result]);
 
     const end = useCallback(() => {
-        decideWinner();
+        getResult();
         setTimeout(() => {
+            setResult("");
             setGameStarted(false);
             setPlayerTurn(false);
             setDealerTurn(false);
             dispatch(clearCards({ target: "player" }));
             dispatch(clearCards({ target: "game" }));
         }, 3000);
-        
-    }, [decideWinner, dispatch]);
+
+    }, [getResult, dispatch]);
 
     useEffect(() => {
         if (busted(playerValue) || busted(dealerValue))
             end();
-        if (blackJack(playerValue))
+        if (blackJack(playerValue) || blackJack(dealerValue))
             end();
     }, [playerValue, dealerValue, end]);
 
-    
+
 
     return (
         <BlackJackContext.Provider value={{
             start, end,
             gameStarted, setGameStarted,
             betValue, setBetValue,
-            winner, setWinner,
+            winner: result, setWinner: setResult,
             playerTurn, setPlayerTurn,
             dealerTurn, setDealerTurn,
             playerValue, dealerValue

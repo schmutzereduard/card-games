@@ -4,9 +4,7 @@ import { BlackJackContext } from "./BlackJack";
 import { getProfile } from "../../utils/LocalStorage";
 import { useDispatch, useSelector } from "react-redux";
 import { drawCards } from "../../features/deckSlice";
-import { busted } from "./Utils";
-
-
+import { blackJack, busted } from "./Utils";
 
 const buttonsHoverState = {
     start: false,
@@ -31,13 +29,26 @@ function buttonHoverReducer(state, action) {
 function Controls() {
 
     const profile = getProfile();
+    
     const navigate = useNavigate();
     const reduxDispatch = useDispatch();
+
     const { deck, playerCards } = useSelector((state) => state.deck);
-    const { start, end, gameStarted, playerTurn, setPlayerTurn, playerValue, dealerTurn, setDealerTurn, dealerValue, betValue, setBetValue } = useContext(BlackJackContext);
-    const [alert, setAlert] = useState("");
-    const [buttonsState, buttonsDispatch] = useReducer(buttonHoverReducer, buttonsHoverState);
+    const { start, end, gameStarted, setPlayerTurn, playerValue, dealerTurn, setDealerTurn, dealerValue, betValue, setBetValue } = useContext(BlackJackContext);
+    
     const betRef = useRef(null);
+    const [alert, setAlert] = useState("");
+    const [forfeit, setForfeit] = useState(false);
+    const [buttonsState, buttonsDispatch] = useReducer(buttonHoverReducer, buttonsHoverState);
+
+    useEffect(() => {
+        betRef.current.focus();
+    }, []);
+
+    useEffect(() => {
+        if (!gameStarted)
+            setForfeit(false);
+    }, [gameStarted]);
 
     useEffect(() => {
         if (buttonsState.start) {
@@ -57,11 +68,13 @@ function Controls() {
         }
     }, [gameStarted, buttonsState]);
 
-    const handleStartButton = () => {
-        if (!gameStarted)
-            validateBet() && start();
-        else
-            end();
+    const startGame = () => {
+        validateBet() && start();
+    }
+
+    const surrender = () => {
+        setForfeit(true);
+        end();
     }
 
     const validateBet = () => {
@@ -116,8 +129,10 @@ function Controls() {
     const doubleDown = () => {
         setBetValue(betValue * 2);
         hit("player");
-        stand("player");
-    }
+        setTimeout(() => {
+            stand("player");
+        }, 1000);
+    };
 
     const canSplit = () => {
 
@@ -138,19 +153,24 @@ function Controls() {
     }
 
     const dealerAutoPlay = useCallback(() => {
-        if (dealerValue <= 16)
+        if (busted(playerValue))
+            return;
+        if (dealerValue < 17) {
             hit("game");
-        if (dealerValue >= 17) {
+        } else {
             stand("game");
             end();
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [dealerValue, hit, stand]);
+    }, [playerValue, dealerValue, hit, stand, end]);
 
     useEffect(() => {
         if (dealerTurn)
             dealerAutoPlay();
-    }, [dealerTurn, dealerAutoPlay]);
+    }, [dealerTurn, dealerValue, dealerAutoPlay]);
+
+    const buttonDisabled = () => {
+        return forfeit || dealerTurn || busted(playerValue) || blackJack(playerValue);
+    }
 
     return (
         <div className="Controls">
@@ -175,7 +195,8 @@ function Controls() {
                     onMouseEnter={() => handleButtonHoverOn("start")}
                     onMouseLeave={() => handleButtonHoverOff("start")}
                     className={gameStarted ? "red-button" : ""}
-                    onClick={handleStartButton}>
+                    onClick={gameStarted ? surrender : startGame}
+                    disabled={buttonDisabled()}>
                     {gameStarted ? "Surrender" : "Start"}
                 </button>
                 <button
@@ -183,7 +204,7 @@ function Controls() {
                     onMouseLeave={() => handleButtonHoverOff("hit")}
                     onClick={() => hit("player")}
                     hidden={!gameStarted}
-                    disabled={busted(playerValue) || !playerTurn}>
+                    disabled={forfeit || dealerTurn || busted(playerValue) || blackJack(playerValue)}>
                     Hit
                 </button>
                 <button
@@ -191,7 +212,7 @@ function Controls() {
                     onMouseLeave={() => handleButtonHoverOff("stand")}
                     onClick={() => stand("player")}
                     hidden={!gameStarted}
-                    disabled={busted(playerValue) || !playerTurn}>
+                    disabled={buttonDisabled()}>
                     Stand
                 </button>
                 <button
@@ -199,12 +220,12 @@ function Controls() {
                     onMouseEnter={() => handleButtonHoverOn("doubleDown")}
                     onMouseLeave={() => handleButtonHoverOff("doubleDown")}
                     onClick={doubleDown}
-                    disabled={busted(playerValue) || !canDoubleDown() || !playerTurn}>
+                    disabled={buttonDisabled() || !canDoubleDown()}>
                     Double Down
                 </button>
                 <button
                     hidden={!gameStarted}
-                    disabled={busted(playerValue) || !canSplit() || !playerTurn}
+                    disabled={buttonDisabled() || !canSplit()}
                     onMouseEnter={() => handleButtonHoverOn("split")}
                     onMouseLeave={() => handleButtonHoverOff("split")}>
                     Split

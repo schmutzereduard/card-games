@@ -43,6 +43,11 @@
     cursor: pointer;
 }
 
+.Controls-Wrapper button.red-button:disabled {
+    background-color: gray;
+    cursor: not-allowed;
+}
+
 .Controls-Wrapper button:disabled {
     background-color: gray;
     /* Style for disabled buttons */
