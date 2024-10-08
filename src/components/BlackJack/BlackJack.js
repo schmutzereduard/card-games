@@ -6,6 +6,7 @@ import Game from './Game';
 import './BlackJack.css';
 import { addFunds, extractFunds, getProfile } from '../../utils/LocalStorage';
 import { blackJack, busted, handValue } from './Utils';
+import History from './History';
 
 export const BlackJackContext = createContext(null);
 
@@ -18,6 +19,7 @@ function BlackJack() {
     const [gameStarted, setGameStarted] = useState(false);
     const [playerTurn, setPlayerTurn] = useState(false);
     const [dealerTurn, setDealerTurn] = useState(false);
+    const [history, setHistory] = useState([]);
 
     const [betValue, setBetValue] = useState(1);
     const [playerValue, setPlayerValue] = useState(0);
@@ -72,13 +74,29 @@ function BlackJack() {
     useEffect(() => {
 
         switch(result) {
-            case "playerWon": addFunds(betValue); break;
-            case "dealerWon": extractFunds(betValue); break;
-            case "forfeit": extractFunds(betValue > 1 ? betValue / 2 : betValue); break;
-            case "tie": break;
+            case "playerWon": {
+                addFunds(betValue);
+                setHistory([...history, `Player won ${betValue}$ | P:${playerValue} vs D:${dealerValue}`]); 
+                break;
+            }
+            case "dealerWon": {
+                setHistory([...history, `Player lost ${betValue}$ | P:${playerValue} vs D:${dealerValue}`]);
+                extractFunds(betValue); 
+                break;
+            }
+            case "forfeit": {
+                const fundsLost = betValue > 1 ? betValue / 2 : betValue;
+                setHistory([...history, `Player forfeited losing ${fundsLost}$ | P:${playerValue} vs D:${dealerValue}`]);
+                extractFunds(fundsLost); 
+                break;
+            }
+            case "tie": {
+                setHistory([...history, `Tie | P:${playerValue} vs D:${dealerValue}`]);
+                break;
+            }
             default: break;
         }
-        
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [result]);
 
@@ -106,7 +124,7 @@ function BlackJack() {
 
     return (
         <BlackJackContext.Provider value={{
-            start, end,
+            start, end, history,
             gameStarted, setGameStarted,
             betValue, setBetValue,
             winner: result, setWinner: setResult,
@@ -119,6 +137,7 @@ function BlackJack() {
 
                 <Controls />
                 <Game />
+                <History />
 
             </div>
         </BlackJackContext.Provider>

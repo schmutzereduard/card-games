@@ -34,7 +34,7 @@ function Controls() {
     const reduxDispatch = useDispatch();
 
     const { deck, playerCards } = useSelector((state) => state.deck);
-    const { start, end, gameStarted, setPlayerTurn, playerValue, dealerTurn, setDealerTurn, dealerValue, betValue, setBetValue } = useContext(BlackJackContext);
+    const { start, end, gameStarted, playerTurn, setPlayerTurn, playerValue, dealerTurn, setDealerTurn, dealerValue, betValue, setBetValue } = useContext(BlackJackContext);
     
     const betRef = useRef(null);
     const [alert, setAlert] = useState("");
@@ -169,7 +169,7 @@ function Controls() {
     }, [dealerTurn, dealerValue, dealerAutoPlay]);
 
     const buttonDisabled = () => {
-        return forfeit || dealerTurn || busted(playerValue) || blackJack(playerValue);
+        return forfeit || (gameStarted && !playerTurn) || dealerTurn || busted(playerValue) || blackJack(playerValue);
     }
 
     return (
@@ -204,7 +204,7 @@ function Controls() {
                     onMouseLeave={() => handleButtonHoverOff("hit")}
                     onClick={() => hit("player")}
                     hidden={!gameStarted}
-                    disabled={forfeit || dealerTurn || busted(playerValue) || blackJack(playerValue)}>
+                    disabled={buttonDisabled()}>
                     Hit
                 </button>
                 <button

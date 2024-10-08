@@ -1,10 +1,37 @@
 .BlackJack {
     display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    height: 100vh; /* Full height for consistency */
 }
 
 .Controls {
+    flex: 0 0 250px; /* Fixed width for Controls */
     display: flex;
     flex-direction: column;
+}
+
+.Cards {
+    flex: 1; /* This allows the Cards section to take up the remaining space */
+    flex-direction: column;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.Cards img {
+    width: 150px; /* Adjust the width as desired */
+    height: auto; /* Maintain aspect ratio */
+    margin: 5px; /* Optional: add some spacing between cards */
+}
+
+.History {
+    flex: 0 0 250px; /* Fixed width for History */
+    display: flex;
+    flex-direction: column;
+    padding-left: 20px; /* Add padding if needed */
+    text-align: center;
 }
 
 .Bet-Wrapper input{
